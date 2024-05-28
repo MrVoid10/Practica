@@ -92,8 +92,8 @@ void Salvare(user *Client, comanda (*ListaComanda)[MarimeMaximaProduse], int *Ma
     
     
     file = fopen("ultimul.txt", "w");
-    fwrite(&ultima, sizeof(ultima), 1, file);
-    //fprintf(file,"%d",ultima);
+    //fwrite(&ultima, sizeof(ultima), 1, file);
+    fprintf(file,"%d",ultima);
     fclose(file);
     printf("\nSalvare ID2: %d", ultima);
 }
