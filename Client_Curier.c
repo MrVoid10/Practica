@@ -121,7 +121,7 @@ return i;}
 
 void PrintTest(tot toturi[], int numElements) {
   for (int j = 0; j < numElements; j++) {
-    printf("\nID[%d]: %d", j, toturi[j].id);
+    printf("\n\nID[%d]: %d", j, toturi[j].id);
     printf("\nNume[%d]: %s", j, toturi[j].client.nume);
     printf("\nPrenume[%d]: %s", j, toturi[j].client.prenume);
     printf("\nEmail[%d]: %s", j, toturi[j].client.email);
@@ -132,10 +132,13 @@ void PrintTest(tot toturi[], int numElements) {
       printf("\nBucata[%d][%d]: %d", j, k, toturi[j].ListaComanda[k].bucata);
       printf("\nPret[%d][%d]: %d", j, k, toturi[j].ListaComanda[k].pret);
     }
+    
   }
 }
 
+// functia aceasta are rol de debug
 void Citire(){
+  printf("\n!!!DEBUG!!!\n");
   tot toturi[100];
   int i = Scanare(toturi);
   PrintTest(toturi,i);
@@ -146,6 +149,7 @@ void Salvare(tot *totatedatele) {
   memcpy(&unu, totatedatele, sizeof(tot)); 
   int ultima = -1;
 
+  
   FILE *fi = fopen("ultimul.txt", "r");
   if(fi != NULL){
   fscanf(fi,"%i",&ultima);}
@@ -191,7 +195,36 @@ void Client() {
 }
 
 void Kurier(){
-  Citire();
+  tot toturi[100];
+  int id_max = Scanare(toturi);
+  int id_curier;
+  int ultima = 0;
+  FILE *file = fopen("comenzi.txt", "a");
+  printf("\n Introduceti id-ul de la comanda\nIntroducere: ");
+  scanf("%d",&id_curier);
+
+  for(int i=0;i < id_max;i++){
+    if(i == id_curier){
+      ultima--;
+      // de printat
+      printf("\nID: %d", toturi[i].id);
+      printf("\nNume: %s",  toturi[i].client.nume);
+      printf("\nPrenume: %s",  toturi[i].client.prenume);
+      printf("\nEmail: %s",  toturi[i].client.email);
+      printf("\nTelefon: %s",  toturi[i].client.telefon);
+      printf("\nMarimeLista: %d",  toturi[i].MarimeLista);
+      for (int k = 0; k < toturi[i].MarimeLista; k++) {
+        printf("\nProdus[%d]: %d", k, toturi[i].ListaComanda[k].produsul);
+        printf("\nBucata[%d]: %d", k, toturi[i].ListaComanda[k].bucata);
+        printf("\nPret[%d]: %d", k, toturi[i].ListaComanda[k].pret);
+      }
+    }
+    else{
+      toturi[i].id = ultima;
+      fwrite(&toturi[i], sizeof(tot), 1, file);
+    }
+  }
+  fclose(file);
 };
 
 int main(){
@@ -205,6 +238,9 @@ int main(){
 
     case 2:
       Kurier();
+    break;
+    case 3: // acest entry e doar pentru debug, daca mai este, atunci am uitat sa scot
+      Citire();
     break;
   }
 return 0;}
