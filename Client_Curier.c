@@ -69,6 +69,67 @@ int PretProdusDupaId(int id){
   }
 };
 
+
+
+void Salvare(user *Client, comanda (*ListaComanda)[MarimeMaximaProduse], int *MarimeLista) {
+    int ultima;
+
+    FILE *file = fopen("ultimul.txt", "r");
+    //fread(&ultima, sizeof(ultima), 1, file);
+    fscanf(file,"%i",&ultima);
+    fclose(file);
+    printf("\nSalvare ID: %d", ultima);
+
+    file = fopen("comenzi.txt", "a");
+    fwrite(&ultima, sizeof(ultima), 1, file);
+    fwrite(Client, sizeof(*Client), 1, file);
+    fwrite(MarimeLista, sizeof(*MarimeLista), 1, file);
+    fwrite(ListaComanda, sizeof(*ListaComanda), *MarimeLista, file);
+    fclose(file);
+    
+    
+    ultima++;
+    
+    
+    file = fopen("ultimul.txt", "w");
+    fwrite(&ultima, sizeof(ultima), 1, file);
+    //fprintf(file,"%d",ultima);
+    fclose(file);
+    printf("\nSalvare ID2: %d", ultima);
+}
+
+
+
+void Citire() {
+    int id;
+    user Client;
+    comanda ListaComanda[MarimeMaximaProduse];
+    int MarimeLista;
+
+    FILE *file;
+
+    file = fopen("comenzi.txt", "r");
+    fread(&id, sizeof(id), 1, file);
+    fread(&Client, sizeof(Client), 1, file);
+    fread(&MarimeLista, sizeof(MarimeLista), 1, file);
+    fread(ListaComanda, sizeof(*ListaComanda), MarimeLista, file);
+    fclose(file);
+
+    printf("\ncitire ID: %d", id); 
+    printf("\ncitire nume: %s", Client.nume); 
+    printf("\ncitire prenume: %s", Client.prenume); 
+    printf("\ncitire email: %s", Client.email);
+    printf("\ncitire telefon: %s", Client.telefon);
+    for(int i=0;i < MarimeLista;i++){  
+      printf("\ncitire produs[%d]: %d",i, ListaComanda[i].produsul); 
+      printf("\ncitire buc[%d]: %d",i, ListaComanda[i].bucata);
+      printf("\ncitire pret[%d]: %d",i, ListaComanda[i].pret);
+    }
+}
+
+
+
+/*
 void Salvare(user *Client,comanda (*ListaComanda)[MarimeMaximaProduse],int *MarimeLista){
   int ultima;
   
@@ -89,19 +150,20 @@ void Salvare(user *Client,comanda (*ListaComanda)[MarimeMaximaProduse],int *Mari
   fwrite(ultima+1,sizeof(ultima),1,file);
   fclose(file);
 }
-
+*/
+/*
 void Citire(){
   int id;
-  user Client;
+  user *Client;
   comanda ListaComanda[MarimeMaximaProduse];
   int MarimeLista;
 
   FILE *file;
   
-  printf("%d",id);
 
   file = fopen("comenzi.txt","r");
   fread(id,sizeof(id),1,file);
+  printf("%d",id);
   fread(Client,sizeof(Client),1,file);
   fread(MarimeLista,sizeof(MarimeLista),1,file);
   fread(ListaComanda,sizeof(ListaComanda),MarimeLista,file);
@@ -109,7 +171,7 @@ void Citire(){
   
   printf("%d",id);
 }
-
+*/
 user Logare(){
   user temp;
   printf("Introduceti numele: ");
@@ -170,7 +232,9 @@ void Client(){
   Citire();
 };
 
-void Kurier(){};
+void Kurier(){
+  Citire();
+};
 
 int main(){
   int Logarea=0;
