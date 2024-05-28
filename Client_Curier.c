@@ -20,6 +20,13 @@ typedef struct {
   int pret;
 }comanda;
 
+typedef struct {
+  int id;
+  user client;
+  int MarimeLista;
+  comanda ListaComanda[MarimeMaximaProduse];
+}tot;
+/// VerificareEmail() - compileru face ravagii ca bla bla bla ca are erori, dar sunt mici warning-uri, la mine e pus compilarea pe padantic asa ca orce problema e eroare
 int VerificareEmail(const char (*email)[EmailSize]) {
   char *p_atChar = strchr(email, '@');// daca are un '#'
   if (p_atChar == NULL) { 
@@ -69,109 +76,6 @@ int PretProdusDupaId(int id){
   }
 };
 
-
-
-void Salvare(user *Client, comanda (*ListaComanda)[MarimeMaximaProduse], int *MarimeLista) {
-    int ultima;
-
-    FILE *file = fopen("ultimul.txt", "r");
-    //fread(&ultima, sizeof(ultima), 1, file);
-    fscanf(file,"%i",&ultima);
-    fclose(file);
-    printf("\nSalvare ID: %d", ultima);
-
-    file = fopen("comenzi.txt", "a");
-    fwrite(&ultima, sizeof(ultima), 1, file);
-    fwrite(Client, sizeof(*Client), 1, file);
-    fwrite(MarimeLista, sizeof(*MarimeLista), 1, file);
-    fwrite(ListaComanda, sizeof(*ListaComanda), *MarimeLista, file);
-    fclose(file);
-    
-    
-    ultima++;
-    
-    
-    file = fopen("ultimul.txt", "w");
-    //fwrite(&ultima, sizeof(ultima), 1, file);
-    fprintf(file,"%d",ultima);
-    fclose(file);
-    printf("\nSalvare ID2: %d", ultima);
-}
-
-
-
-void Citire() {
-    int id;
-    user Client;
-    comanda ListaComanda[MarimeMaximaProduse];
-    int MarimeLista;
-
-    FILE *file;
-
-    file = fopen("comenzi.txt", "r");
-    fread(&id, sizeof(id), 1, file);
-    fread(&Client, sizeof(Client), 1, file);
-    fread(&MarimeLista, sizeof(MarimeLista), 1, file);
-    fread(ListaComanda, sizeof(*ListaComanda), MarimeLista, file);
-    fclose(file);
-
-    printf("\ncitire ID: %d", id); 
-    printf("\ncitire nume: %s", Client.nume); 
-    printf("\ncitire prenume: %s", Client.prenume); 
-    printf("\ncitire email: %s", Client.email);
-    printf("\ncitire telefon: %s", Client.telefon);
-    for(int i=0;i < MarimeLista;i++){  
-      printf("\ncitire produs[%d]: %d",i, ListaComanda[i].produsul); 
-      printf("\ncitire buc[%d]: %d",i, ListaComanda[i].bucata);
-      printf("\ncitire pret[%d]: %d",i, ListaComanda[i].pret);
-    }
-}
-
-
-
-/*
-void Salvare(user *Client,comanda (*ListaComanda)[MarimeMaximaProduse],int *MarimeLista){
-  int ultima;
-  
-  FILE *file = fopen("ultimul.txt","r");
-  fread(ultima,sizeof(ultima),1,file);
-  fclose(file);
-  
-  printf("%d",ultima);
-
-  file = fopen("comenzi.txt","a");
-  fwrite(ultima+1,sizeof(ultima),1,file);
-  fwrite(Client,sizeof(Client),1,file);
-  fwrite(MarimeLista,sizeof(MarimeLista),1,file);
-  fwrite(ListaComanda,sizeof(ListaComanda),MarimeLista,file);
-  fclose(file);
-  
-  file = fopen("ultimul.txt","w");
-  fwrite(ultima+1,sizeof(ultima),1,file);
-  fclose(file);
-}
-*/
-/*
-void Citire(){
-  int id;
-  user *Client;
-  comanda ListaComanda[MarimeMaximaProduse];
-  int MarimeLista;
-
-  FILE *file;
-  
-
-  file = fopen("comenzi.txt","r");
-  fread(id,sizeof(id),1,file);
-  printf("%d",id);
-  fread(Client,sizeof(Client),1,file);
-  fread(MarimeLista,sizeof(MarimeLista),1,file);
-  fread(ListaComanda,sizeof(ListaComanda),MarimeLista,file);
-  fclose(file);
-  
-  printf("%d",id);
-}
-*/
 user Logare(){
   user temp;
   printf("Introduceti numele: ");
@@ -202,35 +106,89 @@ void Meniu(){
   printf("3: Produs 3 | pret 7 per buc \n");
 }
 
-void Client(){
-  user client = Logare();
-  int numproduse;
-  printf("\n%s",client.nume);
-  printf("\n%s",client.prenume);
-  printf("\n%s",client.email);
-  printf("\n%s",client.telefon);
-  Meniu();
-  printf("\nCate produse doriti sa luati, limita de %d\nIntroduceti: ",MarimeMaximaProduse);
-  scanf("%i",&numproduse);
-  while(numproduse > MarimeMaximaProduse){
-    printf("Gresit, Reintroduceti: ");
-    scanf("%i",&numproduse);
+// aici cu salvare si citire fisiere
+
+int Scanare(tot toturi[]) {
+  int i = 0;
+  FILE *file = fopen("comenzi.txt", "r");
+  if (file != NULL) {
+    while (fread(&toturi[i], sizeof(tot), 1, file) == 1) {
+      i++;
+    }
+    fclose(file);
   }
-  comanda Lista[numproduse];
-  printf("\nIntroduceti id la produs dupa un spatiu si catul: ");
+return i;}
+
+void PrintTest(tot toturi[], int numElements) {
+  for (int j = 0; j < numElements; j++) {
+    printf("\nID[%d]: %d", j, toturi[j].id);
+    printf("\nNume[%d]: %s", j, toturi[j].client.nume);
+    printf("\nPrenume[%d]: %s", j, toturi[j].client.prenume);
+    printf("\nEmail[%d]: %s", j, toturi[j].client.email);
+    printf("\nTelefon[%d]: %s", j, toturi[j].client.telefon);
+    printf("\nMarimeLista[%d]: %d", j, toturi[j].MarimeLista);
+    for (int k = 0; k < toturi[j].MarimeLista; k++) {
+      printf("\nProdus[%d][%d]: %d", j, k, toturi[j].ListaComanda[k].produsul);
+      printf("\nBucata[%d][%d]: %d", j, k, toturi[j].ListaComanda[k].bucata);
+      printf("\nPret[%d][%d]: %d", j, k, toturi[j].ListaComanda[k].pret);
+    }
+  }
+}
+
+void Citire(){
+  tot toturi[100];
+  int i = Scanare(toturi);
+  PrintTest(toturi,i);
+}
+
+void Salvare(tot *totatedatele) {
+  tot unu;
+  memcpy(&unu, totatedatele, sizeof(tot)); 
+  int ultima = -1;
+
+  FILE *fi = fopen("ultimul.txt", "r");
+  if(fi != NULL){
+  fscanf(fi,"%i",&ultima);}
+  fclose(fi);
   
-  for(int i=0;i< numproduse;i++){// produsele , buc , pret incarcat
-    scanf("%i",&Lista[i].produsul);
-    scanf("%i",&Lista[i].bucata);
-    Lista[i].pret = PretProdusDupaId(Lista[i].produsul) * Lista[i].bucata;
+  //printf("\nSalvare ID: %d", ultima);
+  unu.id = ultima+1;
+
+  // Deschidem fișierul "comenzi.txt"
+  FILE *file = fopen("comenzi.txt", "a");
+  if (file != NULL) {
+    // Scriem structura "unu" în fișier
+    fwrite(&unu, sizeof(unu), 1, file);
+    fclose(file);
+  }
+  
+  file = fopen("ultimul.txt", "w");
+  fprintf(file,"%d",ultima+1);
+  fclose(file);
+}
+
+void Client() {
+  tot Toatedatele;
+  Toatedatele.client = Logare();
+  Meniu();
+  printf("\nCate produse doriti să luati (limita de %d)?\nIntroduceți: ", MarimeMaximaProduse);
+  scanf("%i", &Toatedatele.MarimeLista);
+  while (Toatedatele.MarimeLista > MarimeMaximaProduse) {
+    printf("Greșit, reintroduceți: ");
+    scanf("%i", &Toatedatele.MarimeLista);
+  }
+  printf("\nIntroduceți ID-ul produsului și cantitatea (separate printr-un spațiu): \n");
+  
+  for (int i = 0; i < Toatedatele.MarimeLista; i++) {
+    printf("[%d]: ",i+1);
+    scanf("%i", &Toatedatele.ListaComanda[i].produsul);
+    scanf("%i", &Toatedatele.ListaComanda[i].bucata);
+    Toatedatele.ListaComanda[i].pret = PretProdusDupaId(Toatedatele.ListaComanda[i].produsul) * Toatedatele.ListaComanda[i].bucata;
   }
 
-  for(int i=0;i< numproduse;i++){// produsele , buc , pret arat
-    printf("\n%d\n%d\n%d\n",Lista[i].produsul,Lista[i].bucata,Lista[i].pret);
-  }
-  Salvare(&client,&Lista,&numproduse);
-  Citire();
-};
+  Salvare(&Toatedatele);
+  Citire(); // debug daca nu uit voi sterge
+}
 
 void Kurier(){
   Citire();
@@ -238,18 +196,15 @@ void Kurier(){
 
 int main(){
   int Logarea=0;
-  printf("logarea: 0 = Client ; 1 = Curier");
+  printf("logarea: 1 = Client ; 2 = Curier");
   scanf("%i",&Logarea);
   switch(Logarea){
-    case 0:
+    case 1:
       Client();
     break;
 
-    case 1:
+    case 2:
       Kurier();
     break;
   }
-  
-
-
 return 0;}
