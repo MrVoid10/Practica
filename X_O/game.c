@@ -57,7 +57,7 @@ void Game() {
         while(row < 4 && row > 0 && col < 4 col row > 0 ){
           printf("Wrong, you should enter the rows and columns between 1 and 3\nInput: ");
           scanf("%d %d", &row, &col);
-        }
+        }row--; col--;
 
         if (board[row][col] == ' ') {
             if (currentPlayer == 1) {
